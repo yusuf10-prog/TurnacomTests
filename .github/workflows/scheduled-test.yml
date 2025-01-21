@@ -19,11 +19,13 @@ jobs:
         distribution: 'temurin'
         cache: maven
         
-    - name: Set up Chrome
-      uses: browser-actions/setup-chrome@latest
+    - name: Setup Firefox
+      uses: browser-actions/setup-firefox@latest
       
-    - name: Set up ChromeDriver
-      uses: nanasess/setup-chromedriver@v2
+    - name: Setup GeckoDriver
+      uses: browser-actions/setup-geckodriver@latest
+      with:
+        token: ${{ github.token }}
         
     - name: Build with Maven
       run: mvn -B clean compile
@@ -32,6 +34,7 @@ jobs:
       run: mvn -B test
       env:
         DISPLAY: :99
+        MOZ_HEADLESS: 1
       
     - name: Generate Allure Report
       if: always()
