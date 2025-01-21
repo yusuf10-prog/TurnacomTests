@@ -8,6 +8,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v3
     
@@ -18,11 +19,20 @@ jobs:
         distribution: 'temurin'
         cache: maven
         
-    - name: Build and Test
-      run: |
-        mvn -B clean compile
-        mvn -B test
+    - name: Set up Chrome
+      uses: browser-actions/setup-chrome@latest
+      
+    - name: Set up ChromeDriver
+      uses: nanasess/setup-chromedriver@v2
         
+    - name: Build with Maven
+      run: mvn -B clean compile
+      
+    - name: Run Tests
+      run: mvn -B test
+      env:
+        DISPLAY: :99
+      
     - name: Generate Allure Report
       if: always()
       run: mvn allure:report
@@ -35,3 +45,4 @@ jobs:
         path: |
           target/cucumber-reports
           target/site/allure-maven-plugin
+          target/surefire-reports
