@@ -1,4 +1,4 @@
-name: Scheduled Test Execution
+name: Daily Rotation Tests
 
 on:
   schedule:
@@ -30,11 +30,13 @@ jobs:
     - name: Build with Maven
       run: mvn -B clean compile
       
-    - name: Run Tests
-      run: mvn -B test
+    - name: Run Daily Tests
+      run: mvn -B test -Dtest=DailyRotationRunner
       env:
         DISPLAY: :99
         MOZ_HEADLESS: 1
+        TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+        TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
     - name: Generate Allure Report
       if: always()
@@ -58,11 +60,14 @@ jobs:
         server_port: 465
         username: ${{ secrets.EMAIL_USERNAME }}
         password: ${{ secrets.EMAIL_PASSWORD }}
-        subject: Test Results - ${{ github.repository }}
+        subject: Daily Test Results - ${{ github.repository }}
         to: ${{ secrets.RECIPIENT_EMAIL }}
         from: GitHub Actions
         body: |
-          Test results for ${{ github.repository }}
+          Daily Test Results for ${{ github.repository }}
+          
+          Date: ${{ steps.date.outputs.date }}
+          Test Scenario: According to the day of week
           
           Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           
